@@ -214,9 +214,39 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Observe elements for scroll animations
-document.querySelectorAll(".service-card, .testimonial-card").forEach((el) => {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(30px)";
-    el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
-    observer.observe(el);
-});
+document
+    .querySelectorAll(".service-card, .testimonial-card, .stat-item")
+    .forEach((el) => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(30px)";
+        el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+        observer.observe(el);
+    });
+
+// Stat counter animation
+const counters = document.querySelectorAll(".stat-number");
+const counterObserver = new IntersectionObserver(
+    (entries, obs) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = +el.dataset.target;
+                let current = 0;
+                const increment = Math.ceil(target / (2000 / 16));
+                const update = () => {
+                    current += increment;
+                    if (current < target) {
+                        el.textContent = current;
+                        requestAnimationFrame(update);
+                    } else {
+                        el.textContent = target;
+                    }
+                };
+                update();
+                obs.unobserve(el);
+            }
+        });
+    },
+    { threshold: 1, rootMargin: "0px 0px -50px 0px" }
+);
+counters.forEach((counter) => counterObserver.observe(counter));
